@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="SelectDataFlow" doc:id="5910f1fe-fd03-4936-a2de-9ae4adbf61ab" >
+		<http:listener doc:name="Listener" doc:id="c4196543-a6ef-4148-8ddf-b82b8719428d" config-ref="HTTP_Listener_config" path="/SelectData"/>
+		<db:select doc:name="Select" doc:id="f2893171-a248-41d7-8a04-e02dab63fe2c" config-ref="Database_Config">
+			<db:sql >select * from naidu.employee</db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="c3718b24-c4be-4c77-88fd-2a5690d443a1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	catalog: {
+		(payload map ( payload01 , indexOfPayload01 ) -> {
+			book: {
+				author: payload01.EmployeeName,
+				title: payload01.EmpDept,
+				price: payload01.EmpId
+			}
+		})
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

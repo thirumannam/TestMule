@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="76331935-f204-4a0c-84ca-28e8a53b75f9" >
+		<http:listener-connection host="0.0.0.0" port="12334" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="7934cc10-ab35-4c06-985e-7ddf7f0a1e49" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="password" database="naidu" />
+	</db:config>
+	<flow name="InsertData" doc:id="3c565730-bb62-4304-b6b2-1ed06920f311" >
+		<http:listener doc:name="Listener" doc:id="c098f370-89a2-495d-b99e-fde89d0093a3" config-ref="HTTP_Listener_config" path="/InsertData">
+			<http:response >
+				<http:body ><![CDATA[#['data Inserted successfully']]]></http:body>
+			</http:response>
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="26de1be5-806e-4e0a-9232-7fe0e535bc18">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload.catalog.*book map ( book , indexOfBook ) -> {
+
+	EmpId: book.price as String,
+	EmployeeName: book.genre,
+	EmpDept: book.author
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="b21efc2c-05a5-42f5-9c7f-1deca4b42095" config-ref="Database_Config">
+			<db:sql >INSERT INTO `naidu`.`employee`(`EmpId`,`EmployeeName`,`EmpDept`) VALUES (:EmpId, :EmployeeName, :EmpDept);</db:sql>
+		</db:bulk-insert>
+	</flow>
+</mule>

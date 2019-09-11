@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<flow name="VMPublishAndPCFlow" doc:id="750f3896-3be2-45e9-81a2-44c845712577" >
+		<http:listener doc:name="Listener" doc:id="0343965d-3da2-4bfc-b78d-3640a4572d5f" config-ref="HTTP_Listener_config" path="/PublishTest"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7db54114-1fc3-4235-ba0f-c944e3bc6b96" />
+		<choice doc:name="Choice" doc:id="0c54e5e2-952a-41ed-94f4-925fb8019354" >
+			<when expression="#[sizeOf(payload) &gt; 0]">
+				<vm:publish doc:name="Publish" doc:id="edf69c60-db69-4c72-be30-49892254da7e" config-ref="VM_Config" queueName="test.one"/>
+			</when>
+			<otherwise >
+				<vm:publish-consume doc:name="Publish consume" doc:id="243a4ae9-d021-4c22-a24b-97820c108dfd" config-ref="VM_Config" queueName="test.one"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="5c34b738-6c2e-4ee5-ad09-3adc75e0e4c6" />
+		<vm:publish queueName="test.three" doc:name="Publish" doc:id="617beb05-3eb7-4a91-befe-fa9fe4454a6c" config-ref="VM_Config"/>
+	</flow>
+</mule>

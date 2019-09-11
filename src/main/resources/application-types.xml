@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="empl" format="xml">
+      <types:example format="xml" element="catalog" location="examples/samplebook.xml"/>
+    </types:type>
+    <types:type name="out" format="xml">
+      <types:example format="xml" element="catalog" location="examples/out-1.xml"/>
+    </types:type>
+    <types:type name="update" format="xml">
+      <types:example format="xml" element="book" location="examples/update.xml"/>
+    </types:type>
+    <types:type name="testjson" format="json">
+      <types:shape format="weave" example="examples/test1.json"><![CDATA[%dw 2.0
+
+type testjson = {|
+  employee: {|
+    name: String, 
+    age: Number {"typeId": "int"}, 
+    car: String
+  |}, 
+  employee1: {|
+    name: String, 
+    age: Number {"typeId": "int"}, 
+    car: String
+  |}
+|} {"example": "{\"employee\":{\"name\":\"John\",\"age\":30,\"car\":\"test\"},\"employee1\":{\"name\":\"John\",\"age\":30,\"car\":\"test\"}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#26de1be5-806e-4e0a-9232-7fe0e535bc18">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="empl"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c3718b24-c4be-4c77-88fd-2a5690d443a1">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="out"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#fda04db4-41ef-4300-aa7a-c37a488ef107">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="empl"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#3955ed0a-3e08-41ee-b00c-e11f6e18c8a4">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="empl"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#0fa1af30-0a3b-4769-9592-9e54c9fa03d1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="update"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#38421b92-018c-41db-9b44-f2ebca72c56f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="empl"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#c0ad9e22-d15c-4b6b-998d-47ef198282b2">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="empl"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#547fed95-8f97-400c-b902-30b455492db8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="out"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="testjson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#657c4ee5-d698-4c17-bd9a-180c8b296b9a">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:variables>
+          <types:variable name="original_xml" type="update"/>
+        </types:variables>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="out"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

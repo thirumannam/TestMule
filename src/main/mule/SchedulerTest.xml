@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="bc99b353-0437-43a2-afbc-303ce7156b7a">
+		<http:request-connection host="training-american-ws.cloudhub.io" port="80" />
+	</http:request-config>
+	<flow name="SchedulerTestFlow" doc:id="d2bc99d0-e4fb-4b7b-adb0-30f03bd654f0" >
+		<scheduler doc:name="Scheduler" doc:id="88507c87-7118-4cea-873c-867ce6b73738" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="Flow Reference" doc:id="3208c2ae-0a4d-4e5f-87ae-90a9fce38d68" name="SchedulerTestFlow1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8249c7f9-1bfe-4c46-9f88-776684e1e96b" message="tested2"/>
+	</flow>
+	<flow name="SchedulerTestFlow1" doc:id="66a1fe90-bdf1-44f3-b9b2-c000a872403d" >
+		<http:listener doc:name="Listener" doc:id="9ee2d3b3-da9f-470c-a95f-feef5b4ca8d3" config-ref="HTTP_Listener_config" path="/RestApi"/>
+		<http:request method="GET" doc:name="Request" doc:id="b4ded6c8-bddb-4efd-b536-6cd74443acf1" responseTimeout="#[30000]" config-ref="HTTP_Request_configuration" path="/api/flights">
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="655f7ec5-29d9-49d3-a602-99b0c3ac33d8" message="#[payload]"/>
+	</flow>
+</mule>

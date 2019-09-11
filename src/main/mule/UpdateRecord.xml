@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="UpdateRecordFlow" doc:id="0ecc527a-26d8-4b75-88a0-2f3e370f903f" >
+		<http:listener doc:name="Listener" doc:id="28145cdf-e7e3-4f9d-bea7-60c9fc281ca3" config-ref="HTTP_Listener_config" path="/UpdateRecord">
+			<http:response >
+				<http:body ><![CDATA[#['updated record successfully']]]></http:body>
+			</http:response>
+		</http:listener>
+		<db:update doc:name="Update" doc:id="0fa1af30-0a3b-4769-9592-9e54c9fa03d1" config-ref="Database_Config">
+			<db:sql >update naidu.employee set EmpId=:EmpId,EmployeeName=:EmployeeName,EmpDept=:EmpDept where EmpId=:EmpId</db:sql>
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	
+	EmpId: payload.book.price as String,
+	EmployeeName: payload.book.author,
+	EmpDept: payload.book.author
+}]]]></db:input-parameters>
+		</db:update>
+	</flow>
+</mule>

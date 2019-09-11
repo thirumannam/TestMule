@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="SoapWsdlTestFlow" doc:id="13bea858-0da7-47ce-833e-2f84c957031f" >
+		<http:listener doc:name="Listener" doc:id="c2d9f8c4-a62a-48cb-a858-24d83b01c30b" config-ref="HTTP_Listener_config" path="/WsdlTest"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e8a7ae0e-d4c0-43e0-8da8-4876dc4bd73f" />
+	</flow>
+</mule>

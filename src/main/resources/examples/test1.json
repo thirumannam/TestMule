@@ -1,0 +1,13 @@
+{ 
+	"employee":{
+		"name":	"John", 
+		"age":	30, 
+		"car":	"test" 
+	},
+	
+	"employee1":{
+		"name":	"John", 
+		"age":	30, 
+		"car":	"test" 
+	}
+}

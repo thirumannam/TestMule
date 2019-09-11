@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="4c378798-162b-4bc0-b43e-b6086c01de5e">
+		<http:request-connection host="via.placeholder.com" port="80"/>
+	</http:request-config>
+	<flow name="ImageTestFlow" doc:id="135c0e41-bcd0-4792-8215-c5ebc989bc3f" >
+		<http:listener doc:name="Listener" doc:id="70074956-ada4-48a9-b018-52093b10d084" config-ref="HTTP_Listener_config" path="/ImageTest" outputMimeType="image/jpeg"/>
+		<http:request method="GET" doc:name="Request" doc:id="cf003b94-9a7c-4bd0-9478-624adaadee9b" config-ref="HTTP_Request_configuration1" path="/150"/>
+	</flow>
+</mule>

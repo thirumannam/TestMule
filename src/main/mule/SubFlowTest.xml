@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="1c0cfb1f-3474-4154-b0b8-5892a0609230" >
+		<vm:queues >
+			<vm:queue queueName="test.one" />
+			<vm:queue queueName="test.two" />
+			<vm:queue queueName="test.three" />
+		</vm:queues>
+	</vm:config>
+	<sub-flow name="Inner_SubFlow" doc:id="fd2f1dc4-1567-438a-a78c-992489e1332b" >
+		<logger level="INFO" doc:name="Logger" doc:id="91722f16-167f-4c22-b9b8-76dfef0ff1e5" message="More then 10 record" />
+		<ee:transform doc:name="Transform Message" doc:id="547fed95-8f97-400c-b902-30b455492db8">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	employee: {
+		age: payload.EmpId default 0,
+		name: payload.EmployeeName default "",
+		car: payload.EmpDept default ""
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b10e7d49-b825-4848-ad3f-8cace7194c1f" message="#[payload]" />
+	</sub-flow>
+	<flow name="Select_Private_Flow" doc:id="b5f67a84-edb4-45bd-8e93-649abdb8b7d4" >
+		<ee:cache doc:name="Cache" doc:id="77bc17ce-cf44-4608-a934-7919c1970489">
+			<db:select doc:name="Select" doc:id="a180e9c4-c986-46c6-9e02-9c63912a6619" config-ref="Database_Config">
+				<db:sql>select * from naidu.employee</db:sql>
+			</db:select>
+		</ee:cache>
+		<logger level="INFO" doc:name="Logger" doc:id="ad9b773a-de64-4abb-866c-d641e30c3234" />
+		<choice doc:name="Choice" doc:id="ba33efd4-e8d7-4137-a512-9e696f0f9b14">
+			<when expression="#[sizeOf(payload) &gt; 10]">
+				<flow-ref doc:name="Flow Reference" doc:id="217b1bd2-3a8e-40b6-9ec4-0495f9e1e87c" name="Inner_SubFlow" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="ce268ec6-82a0-4fa8-9b95-223b36ad7604" message="Less then 10 record"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="640a2301-fcbe-438e-9572-a6173e183200" message="#[payload]"/>
+	</flow>
+	<flow name="Main_Flow_Test" doc:id="e26c9ecc-49fd-45a2-a7f5-575bece2bc1d" >
+		<http:listener doc:name="Listener" doc:id="9332b6c9-e9bb-44bb-9de3-9a26f269b3b8" config-ref="HTTP_Listener_config" path="/SubFlow">
+			<http:response >
+				<http:body ><![CDATA[#[vars.original_xml]]]></http:body>
+			</http:response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="6aaaaf90-eb1b-42a7-93db-ddc7fd6f0f73" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="54c48812-f773-4b04-8ad9-770fc884c5eb" variableName="original_xml"/>
+		<flow-ref doc:name="Flow Reference" doc:id="5674fb26-d1c3-4419-807f-40275c125ed8" name="Select_Private_Flow"/>
+		<set-payload value="#[vars.original_xml]" doc:name="Set Payload" doc:id="c3cefcc6-4bcc-4840-a136-656d72d7a5b0" />
+		<ee:transform doc:name="Transform Message" doc:id="c0ad9e22-d15c-4b6b-998d-47ef198282b2">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload.catalog.*book map ( book , indexOfBook ) -> {
+	
+	EmpId: book.price as String,
+	EmployeeName: book.title,
+	EmpDept: book.author
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="94d62130-d5bc-4d58-9f55-e18d10fd58b1" config-ref="Database_Config">
+			<db:sql >INSERT INTO `naidu`.`employee`(`EmpId`,`EmployeeName`,`EmpDept`) VALUES (:EmpId, :EmployeeName, :EmpDept);</db:sql>
+		</db:bulk-insert>
+		<ee:transform doc:name="Transform Message" doc:id="657c4ee5-d698-4c17-bd9a-180c8b296b9a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	catalog: {
+		book: vars.original_xml.book
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="0453a2d5-206f-4b8e-af1a-f7ba3ca13b77" message="#[vars.original_xml]"/>
+	</flow>
+</mule>

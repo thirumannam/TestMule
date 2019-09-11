@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="DeleteRecordFlow" doc:id="cdc25cdf-8b3c-41a4-814d-97162728602a" >
+		<http:listener doc:name="Listener" doc:id="4cdb2a97-8252-4259-890f-affce7f7e250" config-ref="HTTP_Listener_config" path="/DeleteRecord">
+			<http:response >
+				<http:body ><![CDATA[#['Delete Record successfully']]]></http:body>
+			</http:response>
+		</http:listener>
+		<db:delete doc:name="Delete" doc:id="b93de292-159d-49c9-8fb6-620214b31931" config-ref="Database_Config">
+			<db:sql >delete from naidu.employee where empId=:id</db:sql>
+			<db:input-parameters ><![CDATA[#['id': attributes.queryParams.id as Number]]]></db:input-parameters>
+		</db:delete>
+	</flow>
+</mule>

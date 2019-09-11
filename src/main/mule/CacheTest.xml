@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="CacheTestFlow" doc:id="7da4d2c1-51eb-4c28-9bf7-393730de30f9" >
+		<http:listener doc:name="Listener" doc:id="d251f363-a9bd-4b3b-8fae-43dfa9f2888a" config-ref="HTTP_Listener_config" path="/CacheTest">
+			<http:response >
+				<http:body ><![CDATA[#["tested"]]]></http:body>
+			</http:response>
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="a9a6c049-5c35-4f5b-8f28-f15af5ce396e" />
+		<ee:cache doc:name="Cache" doc:id="fc0e5ae1-bc09-4178-8a08-da07c4e11c61" >
+			<ee:transform doc:name="Transform Message" doc:id="38421b92-018c-41db-9b44-f2ebca72c56f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload.catalog.*book map ( book , indexOfBook ) -> {
+	EmpId: book.price as String,
+	EmployeeName: book.title,
+	EmpDept: book.author
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<db:bulk-insert doc:name="Bulk insert" doc:id="7e5840d4-5937-4c0d-a92e-bb0d50cf1e86" config-ref="Database_Config">
+			<db:sql>INSERT INTO `naidu`.`employee`(`EmpId`,`EmployeeName`,`EmpDept`) VALUES (:EmpId, :EmployeeName, :EmpDept);</db:sql>
+		</db:bulk-insert>
+			<db:select doc:name="Select" doc:id="f779a835-8dcf-48b5-b36c-5fd9c77fcd55" config-ref="Database_Config" queryTimeoutUnit="MICROSECONDS">
+			<db:sql>select * from naidu.employee</db:sql>
+		</db:select>
+		</ee:cache>
+		<choice doc:name="Choice" doc:id="dc6be803-4467-4131-b704-0e3b6aa685db" >
+			<when expression="#[sizeOf(payload) &gt; 1]">
+				<logger level="INFO" doc:name="Logger" doc:id="9f5e1f9a-5af7-45f0-a4a1-93c5a6a08209" message="#['more then one record']"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="523597a9-71f3-41a0-8391-31eee6a506a1" message="less then one record"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

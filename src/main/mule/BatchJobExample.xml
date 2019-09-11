@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="BatchJobExampleFlow1" doc:id="4cb2ccd1-0fe7-4a38-ab6f-ea399ace501f" >
+		<http:listener doc:name="Listener" doc:id="78e4ef28-3d34-4603-8deb-87530ba1f292" config-ref="HTTP_Listener_config" path="/BatchJob"/>
+		<logger level="INFO" doc:name="Logger" doc:id="879171a2-d589-42a1-bafd-175b61ad48a5" message="#[payload]"/>
+		<batch:job jobName="BatchJobExampleBatch_Job" doc:id="dbc9338f-3969-4637-bf17-62cb3d511a1b" blockSize="2">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="ad553a82-0106-4d29-ad01-0c7d73dfa465" >
+					<logger level="WARN" doc:name="Logger" doc:id="b3b2be2f-7a1e-47ad-8c8e-98d56ed99f62" message="Inside Batch Job process"/>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="344dc4e7-7f0e-41b4-a8ca-5e3a8ebc02a0" size="2">
+						<logger level="INFO" doc:name="Logger" doc:id="e2364b16-87e1-4f63-8d59-3c97b9acd3b8" message="Log - Inside Batchagrregator"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="5b84cecd-6691-4fde-86ad-86fe763ecfe9" message="Batch Job Completed"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>
